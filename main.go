@@ -1,11 +1,13 @@
 package main
 
 import (
-	// "log"
-	// "net/http"
-	"fmt"
+	"log"
+	"net/http"
+
+	_ "github.com/fooksupachai/Restful-Golang-Mongo/router"
 )
 
 func main() {
-	fmt.Println("hello")
+	log.Print("Rest server is listening on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
