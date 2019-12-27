@@ -18,6 +18,10 @@ type Account struct {
 	Age  int    `json:"age"`
 }
 
+type Member struct {
+	Name string `json:"name"`
+}
+
 // GetAllUser function
 func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
@@ -53,8 +57,14 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(w, "Get One User")
-	database.GetMember()
+	resp := struct {
+		Age  string `json:"age"`
+		Name string `json:"name"`
+	}{
+		Age:  r.FormValue("age"),
+		Name: r.FormValue("name"),
+	}
+	json.NewEncoder(w).Encode(resp)
 }
 
 // CreateUser function
@@ -63,10 +73,42 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
+
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "Use Method POST instead")
+
 	case "POST":
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Create User")
+
+		var mem Member
+		decoder := json.NewDecoder(r.Body)
+		err := decoder.Decode(&mem)
+
+		if err == nil {
+
+			w.WriteHeader(http.StatusOK)
+
+			resp := struct {
+				Name string `json:"name"`
+			}{
+				Name: mem.Name,
+			}
+			json.NewEncoder(w).Encode(resp)
+		}
+
+		if err != nil {
+
+			w.WriteHeader(http.StatusBadRequest)
+
+			resp := struct {
+				Status int    `json:"status"`
+				Notify string `json:"notify"`
+			}{
+				Status: http.StatusBadRequest,
+				Notify: "Invalid type object",
+			}
+
+			json.NewEncoder(w).Encode(resp)
+		}
+
 	}
 }
