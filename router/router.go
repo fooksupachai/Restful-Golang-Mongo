@@ -7,4 +7,6 @@ import (
 
 func init() {
 	http.HandleFunc("/user", controller.GetUser)
+	http.HandleFunc("/users", controller.GetAllUser)
+	http.HandleFunc("/createUser", controller.CreateUser)
 }
